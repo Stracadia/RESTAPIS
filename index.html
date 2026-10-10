@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Front-End</title>
+</head>
+<body>
+
+    <form id="note-form">
+        <textarea id="task" placeholder="add your new task here..."></textarea>
+        <button>Submit</button>
+    </form>
+
+    <p id="para1"> Notes </p>
+    <ul id="task-list">
+
+    </ul>
+
+    <script>
+        const p1 = document.getElementById('para1')
+        const p2 = document.getElementById('para2')
+        const taskList = document.getElementById('task-list')
+        const noteForm = document.getElementById('note-form')
+        const taskTA = document.getElementById('task')
+        
+        fetch("http://localhost:3000/")
+            .then(response => response.json())
+            .then(data => {
+                p1.textContent = data.message
+            })
+            
+        async function loadData(){
+            const listFile = await fetch("http://localhost:3000/notes")
+            const listTask = await listFile.json()
+
+            for (const tasks of listTask) {
+                const li = document.createElement('li')
+                const task = tasks.task
+                li.textContent = task
+
+                const button = document.createElement('button')
+                button.textContent = "Delete"
+                li.append(button)
+                taskList.append(li)
+            }
+        }
+
+        noteForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            await fetch("http://localhost:3000/notes", {
+                method: "POST",
+                headers: {
+                    "content-type" : "application/json"   
+                },
+                body : JSON.stringify({
+                    task : taskTA.value
+            })
+        });
+        noteForm.reset()  
+    })
+        
+        loadData()
+    </script>
+</body>
+</html>
